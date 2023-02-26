@@ -1,5 +1,5 @@
-## Portfolio Manager
+## Portfolio Manager (kb-app-py-portfolio-manager-rd)
 
 
 ### Backlog
-* import prices from yahoo finance# kb-app-py-portfolio-manager-rd
+* importar precos a partir yahoo finance
