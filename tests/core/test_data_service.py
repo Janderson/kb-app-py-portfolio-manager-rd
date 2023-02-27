@@ -1,5 +1,6 @@
 import unittest
-from core.data_service import DataService
+from datetime import date
+from core.data_service import DataService, DataServiceParams
 import pandas as pd
 
 
@@ -18,7 +19,8 @@ class TestDataService(unittest.TestCase):
         return pd.read_csv(filename, header=[0, 1], index_col=[0])
 
     def test_load_data_service(self):
-        data_service = DataService()
+        params = DataServiceParams(tickers=[], start_date=date.today())
+        data_service = DataService(params=params)
         self.assertEqual(data_service.tickers, [])
 
     def test_convert_tickers(self):
@@ -36,7 +38,9 @@ class TestDataService(unittest.TestCase):
     def test_load_call_method_1(self):
         expected_tickers = ["BOVA11", "SMAL11"]
 
-        data_service = DataService(tickers=expected_tickers)
+        service_params = DataServiceParams(tickers=expected_tickers,
+                                           start_date=date.today())
+        data_service = DataService(params=service_params)
         self.observed_tickers = []
 
         data_service.data_reader_func = self.fake_pandas_reader_func
@@ -54,7 +58,9 @@ class TestDataService(unittest.TestCase):
     def test_load_call_should_call_converted_tickers(self):
         expected_tickers = ["BOVA11", "SMAL11"]
 
-        data_service = DataService(tickers=expected_tickers)
+        service_params = DataServiceParams(tickers=expected_tickers,
+                                           start_date=date.today())
+        data_service = DataService(params=service_params)
         self.observed_tickers = []
 
         def fake_pandas_read(tickers, start_date):
@@ -69,3 +75,4 @@ class TestDataService(unittest.TestCase):
         self.assertEqual(
             data_service.convert_tickers(expected_tickers), self.observed_tickers
         )
+

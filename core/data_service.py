@@ -5,21 +5,23 @@ from core.cdataframe import COHLCDataFrame
 import pandas as pd
 from datetime import date
 
-@dataclass
-class Ticker:
-    ticker: str
 
 @dataclass
-class Ticker:
-    ticker: str
+class DataServiceParams:
+    tickers: List[str]
+    start_date: date
+
+    @classmethod
+    def default(cls):
+        return DataServiceParams(tickers=[], start_date=date.today())
 
 
 class DataService:
-    def __init__(self, tickers: List[Ticker] = []):
-        self.tickers = tickers
+    def __init__(self, params: DataServiceParams = DataServiceParams.default()):
+        self.tickers = params.tickers
         self.data_reader_func = None
         self.cdataframes = []
-        self.start_date = date(2023, 1, 1)
+        self.start_date = params.start_date
         self.build_callbacks()
 
     def get_data_from_yf(self, tickers, start_date):
