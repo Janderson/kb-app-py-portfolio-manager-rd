@@ -22,7 +22,7 @@ class TestMarkowitz(unittest.TestCase):
         self.fake_yfinance_results = pd.read_csv(fixture_path, index_col="Date")
         self.fake_stocks = ["BOVA11.SA", "SMAL11.SA"]
         return super().setUp()
-    
+
     def test_e2e_refactor_run_markowitz_with_file(self):
         expected_min_vol = 0.2056
         expected_max_sharpe = -0.5350
@@ -30,5 +30,3 @@ class TestMarkowitz(unittest.TestCase):
 
         self.assertEqual(round(expected_min_vol, 4), round(observed_min_vol, 4))
         self.assertEqual(round(expected_max_sharpe, 4), round(observed_max_sharpe, 4))
-
-

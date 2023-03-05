@@ -3,7 +3,9 @@ import pandas as pd
 import pandas_datareader.data as web
 import matplotlib.pyplot as plt
 import yfinance as yf
-
+from datetime import date
+from core.data_service import DataServiceParams, DataService
+from core.cdataframe import CDataFramesJoined
 
 
 
@@ -19,6 +21,17 @@ def run_markowitz(stocks, start_date="2019-01-01"):
 
     return calculate(close_prices_df, stocks)
 
+def run_markowitz_from_data_service(stocks, start_date:date = None):
+
+    if start_date is None:
+        start_date = date.today()
+    service_params = DataServiceParams(tickers=stocks,
+                                       start_date=start_date)
+    data_service = DataService(params=service_params)
+    data_service.load()
+
+    cdf_joiner = CDataFramesJoined(data_service.cdataframes)
+    calculate(cdf_joiner.join(), cdf_joiner.tickers)
 
 def calculate(close_prices_df, stocks):
     num_stocks = len(stocks)
@@ -103,4 +116,3 @@ def calculate(close_prices_df, stocks):
 
 def show_results():
     pass
-    

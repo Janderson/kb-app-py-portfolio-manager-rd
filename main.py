@@ -3,10 +3,10 @@
 @author: Janderson FFerreira
 """
 import click
-from core.markowitz import run_markowitz
+from core.markowitz import run_markowitz, run_markowitz_from_data_service
 from datetime import date, timedelta
 
-VERSION = "1.0"
+VERSION = "1.1"
 
 
 @click.group()
@@ -28,7 +28,8 @@ def cmd_run_markowitz(stocks, start_date: str):
     print(f"data fim: {date.today()}")
 
     stocks = stocks.split(",")
-    run_markowitz(stocks, start_date)
+    run_markowitz_from_data_service(stocks=stocks, 
+                                    start_date=start_date)
 
 
 @cli.command("download_yfinance")
