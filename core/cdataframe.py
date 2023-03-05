@@ -30,7 +30,7 @@ class CDataFrame(ABC):
 
     def set(self, dataframe):
         self.__dataframe = dataframe
-    
+
     @property
     def ticker(self):
         return self._info.get("ticker")
@@ -41,7 +41,8 @@ class CDataFrame(ABC):
 
     def is_valid(self):
         return all(
-            [len(set(DATAFRAME_COLUMNS) - set(list(self.dataframe.columns))) == 0]
+            [len(set(DATAFRAME_COLUMNS) - set(list(self.dataframe.columns)))
+             == 0]
         )
 
     @property
@@ -50,7 +51,9 @@ class CDataFrame(ABC):
 
     @staticmethod
     def is_type_obj(obj):
-        return any([isinstance(obj, CDataFrame), issubclass(obj.__class__, CDataFrame)])
+        rules = [isinstance(obj, CDataFrame),
+                 issubclass(obj.__class__, CDataFrame)]
+        return any(rules)
 
 
 class COHLCDataFrame(CDataFrame):
@@ -60,7 +63,8 @@ class COHLCDataFrame(CDataFrame):
         if "timeframe" in self.dataframe.columns:
             self._info["timeframe"] = self.dataframe.timeframe.iloc[0]
         self.set(
-            self.dataframe[DATAFRAME_COLUMNS].sort_values(["time"], ascending=True)
+            self.dataframe[DATAFRAME_COLUMNS]
+                .sort_values(["time"], ascending=True)
         )
 
     def save_price(self, filename):
@@ -87,14 +91,13 @@ class CDataFramesJoined:
         return sorted([cdf.ticker for cdf in self.cdataframes], reverse=False)
 
     def convert_cdf_to_df(self, cdf: COHLCDataFrame):
-        df = cdf.get()[['time', 'close']]
-        df.columns = ['time', cdf.ticker]
+        df = cdf.get()[["time", "close"]]
+        df.columns = ["time", cdf.ticker]
         df.set_index(["time"], inplace=True)
         return df
-    
+
     def join(self):
         dfs = [self.convert_cdf_to_df(cdf)
-                              for cdf in self.cdataframes]
+               for cdf in self.cdataframes]
         final_df = pd.concat(dfs, join="inner", axis=1).reset_index()
         return final_df.rename({"time": "Date"}, axis=1).set_index(["Date"])
-        
