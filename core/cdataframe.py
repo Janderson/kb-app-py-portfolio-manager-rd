@@ -6,9 +6,9 @@ DATAFRAME_COLUMNS = ["time", "open", "high", "low", "close", "volume"]
 
 
 class CDataFrame(ABC):
-    def __init__(self, dataframe, info={}):
+    def __init__(self, dataframe, info=None):
         self.__dataframe = dataframe
-        self._info = info
+        self._info = {}
         self.source = None
         if self.is_valid():
             self.parse()
@@ -64,7 +64,7 @@ class COHLCDataFrame(CDataFrame):
             self._info["timeframe"] = self.dataframe.timeframe.iloc[0]
         self.set(
             self.dataframe[DATAFRAME_COLUMNS]
-                .sort_values(["time"], ascending=True)
+            .sort_values(["time"], ascending=True)
         )
 
     def save_price(self, filename):
