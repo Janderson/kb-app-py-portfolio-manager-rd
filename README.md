@@ -1,8 +1,8 @@
 ## Portfolio Manager (kb-app-py-portfolio-manager-rd)
-
+Ferramenta para gerenciar portfolio (Return Stream) like (BridgeWater)
 
 ### Backlog
-* importar precos a partir yahoo finance
-
-WIP ==> teste do serviço do yfinance
-objetivo converter dados de lá para uma API usavel CDataFrame
+1. Importar precos a partir yahoo finance
+2. (WIP) Carregar todos no mesmo DF usando data_service, rodar markowitz
+3. Fazer Step Antes do markowitz ajustadorAlavancagem todas
+4. permitir carregar dados apartir dos arquivos
