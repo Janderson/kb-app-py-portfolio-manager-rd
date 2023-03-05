@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-
+import pandas as pd
+from typing import List
 
 DATAFRAME_COLUMNS = ["time", "open", "high", "low", "close", "volume"]
 
@@ -8,7 +9,6 @@ class CDataFrame(ABC):
     def __init__(self, dataframe, info={}):
         self.__dataframe = dataframe
         self._info = info
-        self.ticker = None
         self.source = None
         if self.is_valid():
             self.parse()
@@ -30,6 +30,10 @@ class CDataFrame(ABC):
 
     def set(self, dataframe):
         self.__dataframe = dataframe
+    
+    @property
+    def ticker(self):
+        return self._info.get("ticker")
 
     @abstractmethod
     def parse(self):
@@ -50,9 +54,6 @@ class CDataFrame(ABC):
 
 
 class COHLCDataFrame(CDataFrame):
-    def __init__(self, dataframe, info={}):
-        super().__init__(dataframe, info=info)
-
     def parse(self):
         if "ticker" in self.dataframe.columns:
             self._info["ticker"] = self.dataframe.ticker.iloc[0]
@@ -75,3 +76,25 @@ class CCalcDataFrame(CDataFrame):
 
     def parse(self):
         pass
+
+
+class CDataFramesJoined:
+    def __init__(self, cdataframes: List[CDataFrame]):
+        self.cdataframes = cdataframes
+
+    @property
+    def tickers(self):
+        return sorted([cdf.ticker for cdf in self.cdataframes], reverse=False)
+
+    def convert_cdf_to_df(self, cdf: COHLCDataFrame):
+        df = cdf.get()[['time', 'close']]
+        df.columns = ['time', cdf.ticker]
+        df.set_index(["time"], inplace=True)
+        return df
+    
+    def join(self):
+        dfs = [self.convert_cdf_to_df(cdf)
+                              for cdf in self.cdataframes]
+        final_df = pd.concat(dfs, join="inner", axis=1).reset_index()
+        return final_df.rename({"time": "Date"}, axis=1).set_index(["Date"])
+        
