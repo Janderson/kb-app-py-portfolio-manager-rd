@@ -49,8 +49,8 @@ class DataService:
             }
             df = pd.DataFrame(df_dict)
             cdataframe = COHLCDataFrame(df)
-            cdataframe.ticker = ticker
-            cdataframe.source = "yfinance"
+            cdataframe._info["ticker"] = ticker
+            cdataframe._info["source"] = "yfinance"
             self.cdataframes.append(cdataframe)
 
     def before_start_yfinance(self):
