@@ -35,11 +35,24 @@ class TestDataService(unittest.TestCase):
         # THEN
         self.assertEqual(observed_tickers, expected_tickers)
 
+    def test_convert_tickers_2(self):
+        # GIVEN
+        data_service = DataService()
+        tickers = ["BOVA11.SA", "SMAL11.SA"]
+        expected_tickers = ["BOVA11.SA", "SMAL11.SA"]
+
+        # WHEN
+        observed_tickers = data_service.convert_tickers(tickers)
+
+        # THEN
+        self.assertEqual(observed_tickers, expected_tickers)
+
     def test_load_call_method_1(self):
         expected_tickers = ["BOVA11", "SMAL11"]
 
-        service_params = DataServiceParams(tickers=expected_tickers,
-                                           start_date=date.today())
+        service_params = DataServiceParams(
+            tickers=expected_tickers, start_date=date.today()
+        )
         data_service = DataService(params=service_params)
         self.observed_tickers = []
 
@@ -51,15 +64,18 @@ class TestDataService(unittest.TestCase):
         index_on_source = [
             index for index in self.fake_pandas_reader_func([], None).index
         ]
-        index_on_first_df = [index for index in data_service.cdataframes[0].index]
+        index_on_first_df = [index
+                             for index in data_service.cdataframes[0].index]
 
-        self.assertTrue(all([index in index_on_first_df for index in index_on_source]))
+        self.assertTrue(all([index in index_on_first_df
+                             for index in index_on_source]))
 
     def test_load_call_should_call_converted_tickers(self):
         expected_tickers = ["BOVA11", "SMAL11"]
 
-        service_params = DataServiceParams(tickers=expected_tickers,
-                                           start_date=date.today())
+        service_params = DataServiceParams(
+            tickers=expected_tickers, start_date=date.today()
+        )
         data_service = DataService(params=service_params)
         self.observed_tickers = []
 
@@ -73,6 +89,6 @@ class TestDataService(unittest.TestCase):
 
         # THEN
         self.assertEqual(
-            data_service.convert_tickers(expected_tickers), self.observed_tickers
+            data_service.convert_tickers(expected_tickers),
+            self.observed_tickers
         )
-

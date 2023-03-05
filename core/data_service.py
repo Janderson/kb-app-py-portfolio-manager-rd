@@ -17,7 +17,8 @@ class DataServiceParams:
 
 
 class DataService:
-    def __init__(self, params: DataServiceParams = DataServiceParams.default()):
+    def __init__(self,
+                 params: DataServiceParams = DataServiceParams.default()):
         self.tickers = params.tickers
         self.data_reader_func = None
         self.cdataframes = []
@@ -28,18 +29,23 @@ class DataService:
         return pdreader_data.get_data_yahoo(tickers, start=start_date)
 
     def build_callbacks(self):
-        self.data_reader_func = self.get_data_from_yf # , start=start_date
+        self.data_reader_func = self.get_data_from_yf
+        self.before_start = self.before_start_yfinance
 
     def load(self):
-        tickers_data = self.data_reader_func(self.convert_tickers(self.tickers), self.start_date)
-        for ticker, ticker_yf in zip(self.tickers, self.convert_tickers(self.tickers)):
+        self.before_start()
+        tickers_data = self.data_reader_func(
+            self.convert_tickers(self.tickers), self.start_date
+        )
+        for ticker, ticker_yf in zip(self.tickers,
+                                     self.convert_tickers(self.tickers)):
             df_dict = {
                 "close": tickers_data["Adj Close"][ticker_yf],
                 "open": tickers_data["Open"][ticker_yf],
                 "high": tickers_data["High"][ticker_yf],
                 "low": tickers_data["Low"][ticker_yf],
                 "volume": tickers_data["Volume"][ticker_yf],
-                "time": tickers_data.index
+                "time": tickers_data.index,
             }
             df = pd.DataFrame(df_dict)
             cdataframe = COHLCDataFrame(df)
@@ -47,8 +53,14 @@ class DataService:
             cdataframe.source = "yfinance"
             self.cdataframes.append(cdataframe)
 
+    def before_start_yfinance(self):
+        import yfinance as yf
+
+        yf.pdr_override()
+
     def save_prices(self):
         import os
+
         path = "pricesdata"
         os.makedirs(path, exist_ok=True)
         for cdf in self.cdataframes:
@@ -57,5 +69,10 @@ class DataService:
             print(f"prices file: {filename}")
             cdf.save_price(filename)
 
+    def convert_single_ticker(self, ticker):
+        if ".SA" in ticker:
+            return ticker
+        return f"{ticker}.SA"
+
     def convert_tickers(self, tickers):
-        return [f"{ticker}.SA" for ticker in tickers]
+        return [self.convert_single_ticker(ticker) for ticker in tickers]
