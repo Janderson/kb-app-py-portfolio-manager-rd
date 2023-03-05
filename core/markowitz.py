@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 
 
-yf.pdr_override()
 
 
 def get_data_from_yf(stocks, start_date):
+    yf.pdr_override()
     return web.get_data_yahoo(stocks, start=start_date)["Adj Close"]
 
 
@@ -16,6 +16,12 @@ def run_markowitz(stocks, start_date="2019-01-01"):
     num_stocks = len(stocks)
     # download daily price data for each of the stocks in the portfolio
     close_prices_df = get_data_from_yf(stocks, start_date)
+
+    return calculate(close_prices_df, stocks)
+
+
+def calculate(close_prices_df, stocks):
+    num_stocks = len(stocks)
 
     # convert daily stock prices into daily returns
     returns = close_prices_df.pct_change()
@@ -53,6 +59,8 @@ def run_markowitz(stocks, start_date="2019-01-01"):
         # iterate through the weight vector and add data to results array
         for j in range(len(weights)):
             results[j + 3, i] = weights[j]
+        # if i % 1000 == 0:
+        #    print(f"portfolio: {i}")
 
     columns = ["ret", "stdev", "sharpe"]
     columns.extend(stocks)
@@ -76,27 +84,23 @@ def run_markowitz(stocks, start_date="2019-01-01"):
 
     # create scatter plot coloured by Sharpe Ratio
     plt.scatter(
-        results_frame.stdev,
-        results_frame.ret,
-        c=results_frame.sharpe,
-        cmap="RdYlBu"
+        results_frame.stdev, results_frame.ret, c=results_frame.sharpe, cmap="RdYlBu"
     )
     plt.xlabel("Volatility")
     plt.ylabel("Returns")
     plt.colorbar()
     # plot red star to highlight position of portfolio
     # with highest Sharpe Ratio
-    plt.scatter(max_sharpe_port[1],
-                max_sharpe_port[0],
-                marker=(5, 1, 0),
-                color="r",
-                s=1000)
+    plt.scatter(
+        max_sharpe_port[1], max_sharpe_port[0], marker=(5, 1, 0), color="r", s=1000
+    )
 
     # plot green star to highlight position
     # of minimum variance portfolio
-    plt.scatter(min_vol_port[1],
-                min_vol_port[0],
-                marker=(5, 1, 0),
-                color="g",
-                s=1000)
+    plt.scatter(min_vol_port[1], min_vol_port[0], marker=(5, 1, 0), color="g", s=1000)
     plt.savefig(f"simulador-markowitz_{'-'.join(stocks)}.png")
+    return min_vol_port['stdev'], max_sharpe_port['sharpe']
+
+def show_results():
+    pass
+    
