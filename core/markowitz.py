@@ -73,12 +73,12 @@ def calculate(close_prices_df, stocks):
     min_vol_port = results_frame.iloc[results_frame["stdev"].idxmin()]
     print(
         f"\n\n==================\nmaximo sharpe do portifólio:"
-        " {max_sharpe_port['sharpe']:.3}"
+        f" {max_sharpe_port['sharpe']:.3}"
         f"\n====================\npesos: \n{max_sharpe_port})"
     )
     print(
         f"\n\n==================\nvol. mínima do portifólio:"
-        " {(min_vol_port['stdev']*100):.3} %"
+        f" {(min_vol_port['stdev']*100):.3} %"
         f"\n====================\npesos: \n{min_vol_port})"
     )
 
