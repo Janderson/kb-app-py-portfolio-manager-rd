@@ -6,7 +6,7 @@ import yfinance as yf
 from datetime import date
 from core.data_service import DataServiceParams, DataService
 from core.cdataframe import CDataFramesJoined
-
+import os
 
 
 def get_data_from_yf(stocks, start_date):
@@ -15,7 +15,6 @@ def get_data_from_yf(stocks, start_date):
 
 
 def run_markowitz(stocks, start_date="2019-01-01"):
-    num_stocks = len(stocks)
     # download daily price data for each of the stocks in the portfolio
     close_prices_df = get_data_from_yf(stocks, start_date)
 
@@ -111,7 +110,8 @@ def calculate(close_prices_df, stocks):
     # plot green star to highlight position
     # of minimum variance portfolio
     plt.scatter(min_vol_port[1], min_vol_port[0], marker=(5, 1, 0), color="g", s=1000)
-    plt.savefig(f"simulador-markowitz_{'-'.join(stocks)}.png")
+    os.makedirs("reports", exist_ok=True)
+    plt.savefig(f"reports/simulador-markowitz_{'-'.join(stocks)}.png")
     return min_vol_port['stdev'], max_sharpe_port['sharpe']
 
 def show_results():
