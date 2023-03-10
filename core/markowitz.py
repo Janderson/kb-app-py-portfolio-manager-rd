@@ -111,7 +111,7 @@ def calculate(close_prices_df, stocks):
     # of minimum variance portfolio
     plt.scatter(min_vol_port[1], min_vol_port[0], marker=(5, 1, 0), color="g", s=1000)
     os.makedirs("reports", exist_ok=True)
-    plt.savefig(f"reports/simulador-markowitz_{'-'.join(stocks)}.png")
+    plt.savefig(f"reports/simulador-markowitz_{'-'.join(stocks[:5])}.png")
     return min_vol_port['stdev'], max_sharpe_port['sharpe']
 
 def show_results():
