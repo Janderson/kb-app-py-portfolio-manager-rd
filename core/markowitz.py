@@ -31,7 +31,7 @@ def run_markowitz_from_data_service(stocks, start_date:date = None):
     data_service.load()
 
     cdf_joiner = CDataFramesJoined(data_service.cdataframes)
-    calculate(cdf_joiner.join(), cdf_joiner.tickers)
+    calculate(cdf_joiner.join(), stocks)
 
 def calculate(close_prices_df, stocks):
     num_stocks = len(stocks)
