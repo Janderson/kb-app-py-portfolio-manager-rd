@@ -39,7 +39,6 @@ def calculate(close_prices_df, stocks, expected_return=None):
 
     # convert daily stock prices into daily returns
     returns = close_prices_df.pct_change()
-    params = AdjustLeverageParams(expected_return=0)
 
     if expected_return:
         params = AdjustLeverageParams(expected_return=expected_return, stocks=stocks)
@@ -86,12 +85,21 @@ def calculate(close_prices_df, stocks, expected_return=None):
     columns = ["ret", "stdev", "sharpe"]
     columns.extend(stocks)
     results_frame = pd.DataFrame(results.T, columns=columns)
-
     # locate position of portfolio with highest Sharpe Ratio
     max_sharpe_port = results_frame.iloc[results_frame["sharpe"].idxmax()]
 
     # locate positon of portfolio with minimum standard deviation
     min_vol_port = results_frame.iloc[results_frame["stdev"].idxmin()]
+
+    show_results(stocks,
+                 results_frame=results_frame,
+                 min_vol_port=min_vol_port,
+                 max_sharpe_port=max_sharpe_port)
+
+    return min_vol_port['stdev'], max_sharpe_port['sharpe']
+
+
+def show_results(stocks, max_sharpe_port, min_vol_port, results_frame):
     print(
         f"\n\n==================\nmaximo sharpe do portifólio:"
         f" {max_sharpe_port['sharpe']:.3}"
@@ -119,10 +127,7 @@ def calculate(close_prices_df, stocks, expected_return=None):
     # plot green star to highlight position
     # of minimum variance portfolio
     plt.scatter(min_vol_port[1], min_vol_port[0], marker=(5, 1, 0), color="g", s=1000)
-    plt.savefig(f"simulador-markowitz_{'-'.join(stocks)}.png")
-    return min_vol_port['stdev'], max_sharpe_port['sharpe']
-
-def show_results():
+    plt.savefig(f"simulador-markowitz_{'-'.join(stocks)}.png")    
     pass
 
 
