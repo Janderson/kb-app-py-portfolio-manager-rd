@@ -8,6 +8,7 @@ from core.data_service import DataServiceParams, DataService
 from core.cdataframe import CDataFramesJoined
 from dataclasses import dataclass
 from typing import List
+import os
 
 
 def get_data_from_yf(stocks, start_date):
@@ -34,7 +35,7 @@ def run_markowitz_from_data_service(stocks, start_date:date = None):
     cdf_joiner = CDataFramesJoined(data_service.cdataframes)
     calculate(cdf_joiner.join(), cdf_joiner.tickers)
 
-def calculate(close_prices_df, stocks, expected_return=None):
+def calculate(close_prices_df, stocks, expected_return=None, image_name=None):
     num_stocks = len(stocks)
 
     # convert daily stock prices into daily returns
@@ -94,12 +95,13 @@ def calculate(close_prices_df, stocks, expected_return=None):
     show_results(stocks,
                  results_frame=results_frame,
                  min_vol_port=min_vol_port,
-                 max_sharpe_port=max_sharpe_port)
+                 max_sharpe_port=max_sharpe_port,
+                 image_name=image_name)
 
     return min_vol_port['stdev'], max_sharpe_port['sharpe']
 
 
-def show_results(stocks, max_sharpe_port, min_vol_port, results_frame):
+def show_results(stocks, max_sharpe_port, min_vol_port, results_frame, image_name=None):
     print(
         f"\n\n==================\nmaximo sharpe do portifólio:"
         f" {max_sharpe_port['sharpe']:.3}"
@@ -127,7 +129,12 @@ def show_results(stocks, max_sharpe_port, min_vol_port, results_frame):
     # plot green star to highlight position
     # of minimum variance portfolio
     plt.scatter(min_vol_port[1], min_vol_port[0], marker=(5, 1, 0), color="g", s=1000)
-    plt.savefig(f"simulador-markowitz_{'-'.join(stocks)}.png")    
+
+    if image_name:
+        os.makedirs("reports/", exist_ok=True)
+        plt.savefig(f"reports/simulador-markowitz-{image_name}.png")    
+    else:
+        plt.savefig(f"reports/simulador-markowitz-{'-'.join(stocks)}.png")    
 
 
 @dataclass
