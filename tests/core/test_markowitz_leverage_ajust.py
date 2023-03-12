@@ -35,7 +35,7 @@ class TestMarkowitzAdjustLeverage(unittest.TestCase):
         expected_stock_a = "ITSA4"
         expected_stock_b = "PETR4"
 
-        expected_return = 0.1
+        expected_return = 1
         params = AdjustLeverageParams(expected_return=expected_return)
         leverage_applier = LeveragedApplier(self.fake_prices2, params=params)
         leverage_applier.run()
@@ -47,14 +47,15 @@ class TestMarkowitzAdjustLeverage(unittest.TestCase):
             expected_stock_b, leverage_applier.prices_leveraged_df.columns
         )
         return_a_expeted_rules = [
-            leverage_applier.prices_leveraged_df[expected_stock_a] > 0.99,
-            leverage_applier.prices_leveraged_df[expected_stock_a] < 1.10
+            leverage_applier.prices_leveraged_df[expected_stock_a].sum() > 0.99,
+            leverage_applier.prices_leveraged_df[expected_stock_a].sum() < 1.10
         ]
+        print(return_a_expeted_rules)
         self.assertTrue(all(return_a_expeted_rules))
 
         return_b_expeted_rules = [
-            leverage_applier.prices_leveraged_df[expected_stock_a] > 0.99,
-            leverage_applier.prices_leveraged_df[expected_stock_a] < 1.10
+            leverage_applier.prices_leveraged_df[expected_stock_a].sum() > 0.99,
+            leverage_applier.prices_leveraged_df[expected_stock_a].sum() < 1.10
         ]
         self.assertTrue(all(return_b_expeted_rules))
 
