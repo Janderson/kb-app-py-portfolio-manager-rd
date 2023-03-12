@@ -131,15 +131,26 @@ class StockLeveraged:
     stock: str
     leverage: float
 
+class LeveragedApplier:
+    def __init__(self, close_prices_df, params: AdjustLeverageParams):
+        self.prices_df = close_prices_df
+        self.params = params
+        self.prices_leveraged_df = pd.DataFrame()
+
+    def run(self):
+        pass
+
+
+def apply_leveraged(return_series, leverage_factor):
+    return (return_series * leverage_factor).sum()
 
 def return_series_leverage(stock_name, return_series, target_return):
     start_factor = 1
     increment = 0.01
     leverage_factor = start_factor
-    leveraged_series = return_series.copy()
     sign = None
     while True:
-        sum_returns = (leveraged_series * leverage_factor).sum()
+        sum_returns = apply_leveraged(return_series.copy(), leverage_factor)
         print(f"sum_return ({stock_name}): {sum_returns:.2f} ({leverage_factor})")
 
         if sum_returns < target_return:
@@ -159,8 +170,6 @@ def return_series_leverage(stock_name, return_series, target_return):
     return StockLeveraged(stock=stock_name, leverage=round(leverage_factor, 2))
 
 
-
 def adjust_leverage(close_prices_df, params: AdjustLeverageParams):
     returns = close_prices_df.pct_change()
-    import ipdb; ipdb.set_trace()
     return returns, params
