@@ -46,16 +46,11 @@ class TestMarkowitzAdjustLeverage(unittest.TestCase):
         self.assertIn(
             expected_stock_b, leverage_applier.prices_leveraged_df.columns
         )
-        return_a_expeted_rules = [
-            leverage_applier.prices_leveraged_df[expected_stock_a].sum() > 0.99,
-            leverage_applier.prices_leveraged_df[expected_stock_a].sum() < 1.10
-        ]
-        print(return_a_expeted_rules)
-        self.assertTrue(all(return_a_expeted_rules))
 
-        return_b_expeted_rules = [
-            leverage_applier.prices_leveraged_df[expected_stock_a].sum() > 0.99,
-            leverage_applier.prices_leveraged_df[expected_stock_a].sum() < 1.10
-        ]
-        self.assertTrue(all(return_b_expeted_rules))
+        for stock in leverage_applier.prices_leveraged_df.columns:
+            sum_returns = round(leverage_applier.prices_leveraged_df[stock].sum(), 2)
+            rule_a = sum_returns >= 0.99
+            rule_b = sum_returns <= 1.1
+            self.assertTrue(rule_a, f"rule_a ({sum_returns}) fail to stock: {stock}")
+            self.assertTrue(rule_b, f"rule_b ({sum_returns}) fail to stock: {stock}")
 
