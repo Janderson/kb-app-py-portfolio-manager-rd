@@ -6,7 +6,8 @@ import yfinance as yf
 from datetime import date
 from core.data_service import DataServiceParams, DataService
 from core.cdataframe import CDataFramesJoined
-
+from dataclasses import dataclass
+from typing import List
 
 
 def get_data_from_yf(stocks, start_date):
@@ -38,7 +39,8 @@ def calculate(close_prices_df, stocks):
 
     # convert daily stock prices into daily returns
     returns = close_prices_df.pct_change()
-
+    params = AdjustLeverageParams(expected_return=0)
+    returns = adjust_leverage(close_prices_df, stocks, params)
     # calculate mean daily return and covariance of daily returns
     mean_daily_returns = returns.mean()
     cov_matrix = returns.cov()
@@ -116,3 +118,49 @@ def calculate(close_prices_df, stocks):
 
 def show_results():
     pass
+
+
+@dataclass
+class AdjustLeverageParams:
+    expected_return: float
+    stocks: List[str] = None
+
+
+@dataclass
+class StockLeveraged:
+    stock: str
+    leverage: float
+
+
+def return_series_leverage(stock_name, return_series, target_return):
+    start_factor = 1
+    increment = 0.01
+    leverage_factor = start_factor
+    leveraged_series = return_series.copy()
+    sign = None
+    while True:
+        sum_returns = (leveraged_series * leverage_factor).sum()
+        print(f"sum_return ({stock_name}): {sum_returns:.2f} ({leverage_factor})")
+
+        if sum_returns < target_return:
+            if sign:
+                if sign != "+":
+                    break
+            leverage_factor+= increment
+            sign = "+"
+        elif sum_returns > target_return:
+            if sign:
+                if sign != "-":
+                    break
+            leverage_factor-= increment
+            sign = "-"
+        print(f"==> {sign}")
+
+    return StockLeveraged(stock=stock_name, leverage=round(leverage_factor, 2))
+
+
+
+def adjust_leverage(close_prices_df, params: AdjustLeverageParams):
+    returns = close_prices_df.pct_change()
+    import ipdb; ipdb.set_trace()
+    return returns, params
