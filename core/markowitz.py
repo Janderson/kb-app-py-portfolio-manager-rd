@@ -128,7 +128,6 @@ def show_results(stocks, max_sharpe_port, min_vol_port, results_frame):
     # of minimum variance portfolio
     plt.scatter(min_vol_port[1], min_vol_port[0], marker=(5, 1, 0), color="g", s=1000)
     plt.savefig(f"simulador-markowitz_{'-'.join(stocks)}.png")    
-    pass
 
 
 @dataclass
