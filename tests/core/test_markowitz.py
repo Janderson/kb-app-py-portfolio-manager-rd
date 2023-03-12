@@ -1,4 +1,4 @@
-from core.markowitz import run_markowitz, calculate, adjust_leverage
+from core.markowitz import run_markowitz, calculate
 import unittest
 from datetime import date
 import pandas as pd
