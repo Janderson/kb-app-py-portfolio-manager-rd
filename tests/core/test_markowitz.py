@@ -1,4 +1,4 @@
-from core.markowitz import run_markowitz, calculate
+from core.markowitz import run_markowitz, calculate, adjust_leverage
 import unittest
 from datetime import date
 import pandas as pd
@@ -30,3 +30,5 @@ class TestMarkowitz(unittest.TestCase):
 
         self.assertEqual(round(expected_min_vol, 4), round(observed_min_vol, 4))
         self.assertEqual(round(expected_max_sharpe, 4), round(observed_max_sharpe, 4))
+
+

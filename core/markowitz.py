@@ -34,13 +34,19 @@ def run_markowitz_from_data_service(stocks, start_date:date = None):
     cdf_joiner = CDataFramesJoined(data_service.cdataframes)
     calculate(cdf_joiner.join(), cdf_joiner.tickers)
 
-def calculate(close_prices_df, stocks):
+def calculate(close_prices_df, stocks, expected_return=None):
     num_stocks = len(stocks)
 
     # convert daily stock prices into daily returns
     returns = close_prices_df.pct_change()
     params = AdjustLeverageParams(expected_return=0)
-    returns = adjust_leverage(close_prices_df, stocks, params)
+
+    if expected_return:
+        params = AdjustLeverageParams(expected_return=expected_return, stocks=stocks)
+        leverage_applier = LeveragedApplier(close_prices_df=close_prices_df, params=params)
+        leverage_applier.run()
+        returns = leverage_applier.prices_leveraged_df
+
     # calculate mean daily return and covariance of daily returns
     mean_daily_returns = returns.mean()
     cov_matrix = returns.cov()
@@ -173,3 +179,15 @@ def return_series_leverage(stock_name, return_series, target_return):
         #print(f"==> {sign}")
 
     return StockLeveraged(stock=stock_name, leverage=round(leverage_factor, 2))
+
+def run_markowitz_with_leverage_from_data_service(stocks, start_date:date = None, expected_return:float = None):
+
+    if start_date is None:
+        start_date = date.today()
+    service_params = DataServiceParams(tickers=stocks,
+                                       start_date=start_date)
+    data_service = DataService(params=service_params)
+    data_service.load()
+
+    cdf_joiner = CDataFramesJoined(data_service.cdataframes)
+    calculate(cdf_joiner.join(), cdf_joiner.tickers, expected_return=expected_return)
