@@ -144,6 +144,7 @@ class LeveragedApplier:
 def apply_leveraged(return_series, leverage_factor):
     return (return_series * leverage_factor).sum()
 
+
 def return_series_leverage(stock_name, return_series, target_return):
     start_factor = 1
     increment = 0.01
@@ -168,8 +169,3 @@ def return_series_leverage(stock_name, return_series, target_return):
         print(f"==> {sign}")
 
     return StockLeveraged(stock=stock_name, leverage=round(leverage_factor, 2))
-
-
-def adjust_leverage(close_prices_df, params: AdjustLeverageParams):
-    returns = close_prices_df.pct_change()
-    return returns, params
